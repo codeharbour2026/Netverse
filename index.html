@@ -1,0 +1,121 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="theme-color" content="#080d18">
+  <title>NETVERSE — Lab 0.1</title>
+  <link rel="stylesheet" href="./style.css">
+  <script type="importmap">
+    {
+      "imports": {
+        "three": "https://cdn.jsdelivr.net/npm/three@0.169.0/build/three.module.js",
+        "three/addons/": "https://cdn.jsdelivr.net/npm/three@0.169.0/examples/jsm/"
+      }
+    }
+  </script>
+</head>
+<body>
+  <div class="app-shell">
+    <header class="topbar">
+      <div class="brand">
+        <div class="brand-mark"><span></span><span></span><span></span></div>
+        <div><div class="brand-name">NETVERSE</div><div class="brand-sub">NETWORK SIMULATION LAB <b>0.1</b></div></div>
+      </div>
+      <div class="top-status"><span class="live-dot"></span> SIMULATION ONLINE <span class="status-divider"></span><span id="clock">00:00:00</span></div>
+      <div class="top-actions">
+        <button class="quiet-button" id="saveBtn" title="Save this lab in this browser">Save lab</button>
+        <button class="quiet-button" id="loadBtn" title="Load the last saved lab">Load</button>
+        <button class="danger-button" id="resetBtn">Reset lab</button>
+      </div>
+    </header>
+
+    <main class="workspace">
+      <aside class="left-panel panel">
+        <div class="panel-heading"><div><div class="eyebrow">BUILD MODE</div><h2>Infrastructure</h2></div><span class="panel-icon">＋</span></div>
+        <p class="muted intro">Choose a device, then click an empty spot on the grid to place it.</p>
+        <div class="device-list">
+          <button class="device-option active" data-tool="select">
+            <span class="device-symbol cursor-symbol">↖</span><span><b>Select</b><small>Inspect and move around</small></span><kbd>V</kbd>
+          </button>
+          <button class="device-option" data-tool="computer">
+            <span class="device-symbol pc-symbol"><i></i></span><span><b>Computer</b><small>End-user device</small></span><kbd>1</kbd>
+          </button>
+          <button class="device-option" data-tool="router">
+            <span class="device-symbol router-symbol">⌁</span><span><b>Router</b><small>Forwards network traffic</small></span><kbd>2</kbd>
+          </button>
+          <button class="device-option" data-tool="server">
+            <span class="device-symbol server-symbol"><i></i><i></i><i></i></span><span><b>Server</b><small>Hosts services and data</small></span><kbd>3</kbd>
+          </button>
+          <button class="device-option" data-tool="connect">
+            <span class="device-symbol link-symbol">⌁</span><span><b>Connect</b><small>Click two devices to link them</small><kbd>C</kbd></span>
+          </button>
+        </div>
+        <div class="panel-divider"></div>
+        <div class="section-title">NETWORK TOOLS</div>
+        <button class="tool-row" id="sendBtn"><span class="tool-icon">➤</span><span><b>Send test packet</b><small>Send between selected devices</small></span><span class="row-arrow">›</span></button>
+        <button class="tool-row" id="autoBtn"><span class="tool-icon">✦</span><span><b>Build sample network</b><small>Populate a tiny working LAN</small></span><span class="row-arrow">›</span></button>
+        <div class="panel-divider"></div>
+        <div class="section-title">QUICK GUIDE</div>
+        <div class="guide-item"><span>01</span> Add a computer, router and server.</div>
+        <div class="guide-item"><span>02</span> Choose Connect and click two devices.</div>
+        <div class="guide-item"><span>03</span> Select a source and destination, then send a packet.</div>
+        <div class="left-footer"><span class="tiny-dot"></span> LOCAL SIMULATION <span class="footer-version">BUILD 001</span></div>
+      </aside>
+
+      <section class="canvas-area">
+        <div class="canvas-toolbar">
+          <div class="breadcrumb"><span>WORKSPACE</span><span class="crumb-slash">/</span><b>LAB-01</b></div>
+          <div class="canvas-tools"><span class="hint-chip">DRAG TO ORBIT</span><span class="hint-chip">SCROLL TO ZOOM</span><button id="homeViewBtn" class="icon-button" title="Reset camera">⌂</button></div>
+        </div>
+        <div id="viewport" class="viewport">
+          <div class="scene-label"><span class="scene-label-dot"></span> LAB ENVIRONMENT <span>·</span> 3D VIEW</div>
+          <div class="axis-legend"><span><i class="axis-x"></i> X</span><span><i class="axis-z"></i> Z</span></div>
+          <div class="canvas-help" id="canvasHelp">SELECT A DEVICE OR CHOOSE A TOOL</div>
+          <div class="canvas-toast" id="toast" role="status"></div>
+        </div>
+        <div class="bottom-bar">
+          <div class="bottom-stat"><span class="stat-icon">▦</span><span><b id="deviceCount">0</b><small>DEVICES</small></span></div>
+          <div class="bottom-stat"><span class="stat-icon">⌁</span><span><b id="linkCount">0</b><small>CONNECTIONS</small></span></div>
+          <div class="bottom-stat"><span class="stat-icon">➤</span><span><b id="packetCount">0</b><small>PACKETS SENT</small></span></div>
+          <div class="bottom-spacer"></div>
+          <div class="sim-controls"><span class="sim-indicator"></span> SIMULATION <b>RUNNING</b></div>
+        </div>
+      </section>
+
+      <aside class="right-panel panel">
+        <div class="panel-heading"><div><div class="eyebrow">INSPECTOR</div><h2>Device details</h2></div><span class="inspect-status">● READY</span></div>
+        <div id="emptyInspector" class="empty-inspector">
+          <div class="empty-graphic"><div class="empty-cube">◇</div><span></span></div>
+          <b>Nothing selected</b>
+          <p>Select a device in the 3D lab to inspect its properties and network settings.</p>
+        </div>
+        <div id="deviceInspector" class="device-inspector hidden">
+          <div class="selected-device-card">
+            <div class="selected-device-icon" id="selectedIcon">▣</div>
+            <div><div class="eyebrow" id="selectedType">COMPUTER</div><h3 id="selectedName">Workstation 01</h3><span class="online-label"><i></i> ONLINE</span></div>
+          </div>
+          <label class="field-label" for="deviceName">DEVICE NAME</label>
+          <input id="deviceName" class="text-input" maxlength="24">
+          <label class="field-label" for="deviceIp">IP ADDRESS</label>
+          <input id="deviceIp" class="text-input mono" maxlength="15">
+          <div class="property-grid">
+            <div class="property"><small>INTERFACES</small><b id="interfaceCount">0</b></div>
+            <div class="property"><small>DEVICE ID</small><b id="deviceId">NV-001</b></div>
+          </div>
+          <div class="panel-divider"></div>
+          <div class="section-title">PACKET TEST</div>
+          <label class="field-label" for="packetTarget">DESTINATION DEVICE</label>
+          <select id="packetTarget" class="text-input"></select>
+          <button class="primary-button full-button" id="inspectSendBtn">➤ &nbsp; Send packet from this device</button>
+          <button class="delete-button" id="deleteDeviceBtn">Delete device</button>
+        </div>
+        <div class="panel-divider log-divider"></div>
+        <div class="log-heading"><div><div class="section-title">EVENT LOG</div><span class="muted tiny">Latest simulation activity</span></div><button id="clearLogBtn" class="clear-button">CLEAR</button></div>
+        <div id="eventLog" class="event-log"><div class="log-empty">Waiting for simulation events…</div></div>
+      </aside>
+    </main>
+  </div>
+  <script type="module" src="./main.js"></script>
+</body>
+</html>
